@@ -67,8 +67,8 @@ public class RPNCalculator {
 	 * Abstract Command class with default state.
 	 * 
 	 */
-	abstract class Command {
-		State execute(State in) {
+	public abstract class Command {
+		public State execute(State in) {
 			return in;
 		}
 	}
@@ -78,11 +78,11 @@ public class RPNCalculator {
 	 * @Desc State After each command execution state is saved.
 	 * 
 	 */
-	protected class State {
+	public class State {
 		State prevState;
 		Deque<Double> stack = null;
 
-		State() {
+		public State() {
 			prevState = null;
 			stack = new LinkedList<Double>();
 		}
@@ -104,7 +104,7 @@ public class RPNCalculator {
 	 * Command to push Input Number .
 	 * 
 	 */
-	protected class PushCommand extends Command {
+	private class PushCommand extends Command {
 		private Double inputNum;
 
 		PushCommand(Double inputNum) {
@@ -126,7 +126,7 @@ public class RPNCalculator {
 	 * Method to call each respective command execute method for Push,+,*,-,/,undo, clear, stop, sqrt command
 	 * @return State after each command execution
 	 */
-	protected class RunCommand extends Command {
+	private class RunCommand extends Command {
 		private List<Command> cmdList = new LinkedList<Command>();
 
 		RunCommand(Collection<Command> subCmds) {
@@ -170,7 +170,7 @@ public class RPNCalculator {
 	/**
 	 * Method to clear stack 
 	 */
-	protected void clearCommand() {
+	private void clearCommand() {
 		cmdMap.put("clear", new Command() {
 			public State execute(State in) {
 				State out = new State(in);
@@ -183,14 +183,22 @@ public class RPNCalculator {
 	/**
 	 * sqrt operation
 	 */
-	protected void sqrtCommand() {
+	private void sqrtCommand() {
 		cmdMap.put("sqrt", new Command() {
 			public State execute(State in) {
 				position++;
 				State out = new State(in);
-				Double x = out.stack.pop();
+				Double x  = null;
+				try {
+				x = out.stack.pop();
 				out.stack.push(Math.sqrt(x));
 				return out;
+				} catch (NoSuchElementException e) {
+					out.stack.push(x);
+					System.out.println(" operator sqrt (position :  " + position+ ")  : insufficient parameters " );
+					displayStack(out.prevState);
+					throw new NoSuchElementException();
+				}
 			}
 		});
 	}
@@ -198,7 +206,7 @@ public class RPNCalculator {
 	/**
 	 * divide operation
 	 */
-	protected void divideCommand() {
+	private void divideCommand() {
 		cmdMap.put("/", new Command() {
 			public State execute(State in) {
 				position++;
@@ -209,6 +217,10 @@ public class RPNCalculator {
 					x = out.stack.pop();
 					Double y = out.stack.pop();
 					out.stack.push(y / x);
+					if(out.stack.getLast().isInfinite()){
+						out.stack.clear();
+						throw new ArithmeticException();
+					}
 				} catch (ArithmeticException exe) {
 					throw new ArithmeticException();
 				} catch (NoSuchElementException e) {
@@ -226,7 +238,7 @@ public class RPNCalculator {
 	/**
 	 *  multiply operation
 	 */
-	protected void multiplyCommand() {
+	private void multiplyCommand() {
 		cmdMap.put("*", new Command() {
 			public State execute(State in) {
 				position++;
@@ -252,7 +264,7 @@ public class RPNCalculator {
 	/**
 	 * substract operation
 	 */
-	protected void substractCommand() {
+	private void substractCommand() {
 		cmdMap.put("-", new Command() {
 			public State execute(State in) {
 				position++;
@@ -279,7 +291,7 @@ public class RPNCalculator {
 	/**
 	 * Add operation
 	 */
-	protected void addCommand() {
+	private void addCommand() {
 		cmdMap.put("+", new Command() {
 			public State execute(State in) {
 				position++;
@@ -306,7 +318,7 @@ public class RPNCalculator {
 	/**
 	 * Method to display Current Stack elements.
 	 */
-	protected void displayStack(State currentState) {
+	public void displayStack(State currentState) {
 		System.out.print("Stack : ");
 		for (Iterator<Double> itr = currentState.stack.descendingIterator(); itr
 				.hasNext();) {
@@ -322,7 +334,7 @@ public class RPNCalculator {
 	 * input is operator then corresponding command is returned, if not designated value then exception
 	 * @throws Exception
 	 */
-	protected Command parseCommand(String inputCmd) throws Exception {
+	private Command parseCommand(String inputCmd) throws Exception {
 		Command cmd = cmdMap.get(inputCmd);
 
 		if (cmd != null)
@@ -347,7 +359,7 @@ public class RPNCalculator {
 		return matcher.matches();
 	}
 
-	protected Command parseInput(String inputString) throws Exception {
+	public Command parseInput(String inputString) throws Exception {
 		List<Command> inputCmdList = new LinkedList<Command>();
 
 		for (String subCmdStr : inputString.split("\\s+"))
