@@ -1,10 +1,12 @@
-Environment - JDK1.7
-Contents ñ Source Files and jar file. Please run the jar file for program execution.
+Environment - JDK1.7 JUnit 4
+Contents ‚Äì Source Files and jar file. Please run the jar file for program execution.
  
 The Code is written for Reverse Polish Notation calculation using Command Pattern.
  
 The allowed inputs parameters are Numbers and Operators ( +, -, *, /, undo, clear, sqrt and stop). 
 Stop operator will terminate the program execution. 
 
-If any value other than allowed parameters entered, program will terminate with message ìInvalid Inputs Passedî.
+If any value other than allowed parameters entered, program will terminate with message ‚ÄúInvalid Inputs Passed‚Äù.
+
+Added JUnit Test cases for all operations
  
